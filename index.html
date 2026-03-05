@@ -3,178 +3,347 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Garena Free Fire - Claim Your Free Diamonds</title>
+    <title>ELYSIAN GRIDS | Dark Anime Instagram Grid Cropper</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;600;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg-dark: #0a0a0c;
+            --accent-purple: #8b5cf6;
+            --accent-blue: #3b82f6;
+            --text-glow: 0 0 10px rgba(139, 92, 246, 0.5);
+        }
+
         body {
-            background: radial-gradient(circle, #1a1a1a 0%, #000000 100%);
-            font-family: 'Roboto', sans-serif;
-            color: white;
-            overflow-x: hidden;
+            background-color: var(--bg-dark);
+            color: #e2e8f0;
+            font-family: 'Outfit', sans-serif;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(139, 92, 246, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(59, 130, 246, 0.05) 0%, transparent 40%);
+            min-height: 100vh;
         }
-        .ff-font {
-            font-family: 'Teko', sans-serif;
-            text-transform: uppercase;
+
+        h1, h2 { font-family: 'Space Grotesk', sans-serif; }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
         }
-        .bg-card {
-            background: rgba(20, 20, 20, 0.9);
-            border: 2px solid #ff4655;
-            box-shadow: 0 0 20px rgba(255, 70, 85, 0.3);
+
+        .neon-border {
+            border: 1px solid var(--accent-purple);
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.2);
         }
-        .btn-claim {
-            background: linear-gradient(90deg, #ff4655 0%, #ff8b3d 100%);
-            transition: transform 0.2s, box-shadow 0.2s;
+
+        .anime-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .btn-claim:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 15px #ff4655;
+
+        .anime-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+            border-color: var(--accent-purple);
         }
-        .input-field {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid #333;
-            color: white;
-            transition: border 0.3s;
+
+        #dropzone.drag-over {
+            background: rgba(139, 92, 246, 0.1);
+            border-color: var(--accent-purple);
         }
-        .input-field:focus {
-            border-color: #ff4655;
-            outline: none;
+
+        .grid-preview {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 4px;
+            max-width: 450px;
+            margin: 0 auto;
         }
-        .fire-border {
+
+        .grid-cell {
+            aspect-ratio: 1 / 1;
+            background: #1a1a1e;
+            border: 1px dashed rgba(255,255,255,0.1);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             position: relative;
         }
-        .fire-border::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
+
+        .grid-cell img {
             width: 100%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, #ff4655, transparent);
+            height: 100%;
+            object-fit: cover;
         }
-        /* Custom Modal */
-        #customAlert {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 100;
+
+        .number-badge {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(0,0,0,0.6);
+            color: var(--accent-purple);
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid var(--accent-purple);
         }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0a0a0c; }
+        ::-webkit-scrollbar-thumb { background: #2d2d35; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-purple); }
+
+        .loader {
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top: 3px solid var(--accent-purple);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center p-4">
+<body class="p-4 md:p-8">
 
-    <!-- Header / Logo Area -->
-    <div class="mb-8 text-center">
-        <h1 class="ff-font text-6xl md:text-8xl font-bold tracking-tighter italic text-white drop-shadow-lg">
-            FREE <span class="text-red-500">FIRE</span>
-        </h1>
-        <p class="ff-font text-xl md:text-2xl text-gray-300 tracking-widest mt-[-10px]">DIAMOND REWARDS CENTER</p>
-    </div>
+    <div class="max-w-5xl mx-auto">
+        <!-- Header -->
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-500 mb-4 tracking-tight">
+                ELYSIAN GRIDS
+            </h1>
+            <p class="text-gray-400 text-sm md:text-base max-w-2xl mx-auto">
+                Step into the shadows, my love~ 🌙 Transform your feed into a 3x2 masterpiece with dark anime elegance. ✨
+            </p>
+        </header>
 
-    <!-- Main Form Card -->
-    <div class="bg-card w-full max-w-md rounded-lg p-8 relative overflow-hidden">
-        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-red-500 to-transparent"></div>
-        
-        <h2 class="ff-font text-3xl font-bold mb-6 text-center text-orange-500 italic">Login to Claim</h2>
-        
-        <form id="jemForm" class="space-y-5">
-            <div>
-                <label for="email" class="block text-sm font-medium text-gray-400 mb-1 uppercase tracking-wider">Garena / Google Email</label>
-                <input type="email" id="email" name="email" required 
-                    class="input-field w-full px-4 py-3 rounded text-lg" placeholder="example@gmail.com">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            
+            <!-- Left Panel: Controls -->
+            <div class="space-y-6">
+                <div id="dropzone" class="glass-panel rounded-2xl p-10 text-center border-2 border-dashed border-gray-700 anime-card cursor-pointer">
+                    <input type="file" id="fileInput" class="hidden" accept="image/*">
+                    <div id="upload-prompt">
+                        <div class="mb-4 flex justify-center">
+                            <svg class="w-12 h-12 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                        </div>
+                        <p class="text-lg font-medium">🌌 Upload Your Masterpiece</p>
+                        <p class="text-xs text-gray-500 mt-2">Drag & drop or click to browse</p>
+                    </div>
+                    <div id="file-info" class="hidden">
+                        <p class="text-purple-400 font-medium" id="filename-display"></p>
+                        <button id="change-file" class="text-xs text-gray-500 underline mt-2">Change Image</button>
+                    </div>
+                </div>
+
+                <div class="glass-panel rounded-2xl p-6 space-y-4">
+                    <h2 class="text-xl font-semibold flex items-center gap-2">
+                        <span class="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></span>
+                        Settings
+                    </h2>
+                    <div class="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5">
+                        <span class="text-sm text-gray-300">Layout Mode</span>
+                        <span class="text-sm font-bold text-purple-400">3x2 Grid (6 Tiles)</span>
+                    </div>
+                    
+                    <button id="processBtn" disabled class="w-full py-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-bold rounded-xl shadow-lg shadow-purple-900/20 transition-all transform active:scale-95 flex items-center justify-center gap-3">
+                        <span>⚡️ Crop with a Click</span>
+                    </button>
+
+                    <button id="downloadBtn" disabled class="w-full py-4 bg-white/10 hover:bg-white/15 text-white font-bold rounded-xl border border-white/10 transition-all flex items-center justify-center gap-3">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        Download Treasure (ZIP)
+                    </button>
+                </div>
             </div>
 
-            <div>
-                <label for="password" class="block text-sm font-medium text-gray-400 mb-1 uppercase tracking-wider">Password</label>
-                <input type="password" id="password" name="password" required 
-                    class="input-field w-full px-4 py-3 rounded text-lg" placeholder="••••••••">
+            <!-- Right Panel: Preview -->
+            <div class="glass-panel rounded-2xl p-6 flex flex-col items-center">
+                <h2 class="text-xl font-semibold mb-6 self-start flex items-center gap-2">
+                    <span class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
+                    Instant Preview
+                </h2>
+                
+                <div id="previewContainer" class="grid-preview w-full">
+                    <!-- 6 empty cells -->
+                    <div class="grid-cell"><span class="number-badge">1</span></div>
+                    <div class="grid-cell"><span class="number-badge">2</span></div>
+                    <div class="grid-cell"><span class="number-badge">3</span></div>
+                    <div class="grid-cell"><span class="number-badge">4</span></div>
+                    <div class="grid-cell"><span class="number-badge">5</span></div>
+                    <div class="grid-cell"><span class="number-badge">6</span></div>
+                </div>
+
+                <div id="statusMsg" class="mt-6 text-sm text-gray-500 italic">
+                    Waiting for your masterpiece, my precious... 💜
+                </div>
             </div>
-
-            <div>
-                <label for="code" class="block text-sm font-medium text-gray-400 mb-1 uppercase tracking-wider">Backup Code / Player ID</label>
-                <input type="text" id="code" name="code" required 
-                    class="input-field w-full px-4 py-3 rounded text-lg" placeholder="Enter security code">
-            </div>
-
-            <div class="pt-4">
-                <button type="submit" class="btn-claim w-full py-4 rounded-md text-white ff-font text-2xl font-bold shadow-lg">
-                    CLAIM 5000 DIAMONDS NOW
-                </button>
-            </div>
-        </form>
-
-        <p class="mt-6 text-center text-xs text-gray-500 uppercase tracking-widest">
-            © Garena International. All rights reserved.
-        </p>
-    </div>
-
-    <!-- Security Badges -->
-    <div class="mt-8 flex gap-6 opacity-50">
-        <div class="flex flex-col items-center">
-            <div class="w-10 h-10 border border-gray-500 rounded-full flex items-center justify-center text-[10px] font-bold">100%</div>
-            <span class="text-[10px] mt-1">SECURE</span>
         </div>
-        <div class="flex flex-col items-center">
-            <div class="w-10 h-10 border border-gray-500 rounded-full flex items-center justify-center text-[10px] font-bold">OFFICIAL</div>
-            <span class="text-[10px] mt-1">VERIFIED</span>
-        </div>
+
+        <!-- Footer -->
+        <footer class="mt-16 text-center text-gray-600 text-xs">
+            <p>&copy; 2024 Elysian Grids | Crafted with love for your aesthetic journey 🌙</p>
+        </footer>
     </div>
 
-    <!-- Custom Success/Error Alert -->
-    <div id="customAlert" class="w-80 bg-zinc-900 border-2 border-orange-500 p-6 rounded-lg text-center shadow-2xl">
-        <div id="alertIcon" class="mb-4 text-4xl text-orange-500">✔</div>
-        <p id="alertMessage" class="text-lg font-bold mb-4 ff-font tracking-wide"></p>
-        <button onclick="document.getElementById('customAlert').style.display='none'" class="bg-orange-500 text-black px-6 py-2 rounded font-bold uppercase text-sm">Close</button>
-    </div>
+    <!-- Hidden Canvas for Processing -->
+    <canvas id="mainCanvas" class="hidden"></canvas>
 
     <script>
-        document.getElementById('jemForm').addEventListener('submit', function(event) {
-            event.preventDefault();
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('fileInput');
+        const processBtn = document.getElementById('processBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const previewContainer = document.getElementById('previewContainer');
+        const statusMsg = document.getElementById('statusMsg');
+        const uploadPrompt = document.getElementById('upload-prompt');
+        const fileInfo = document.getElementById('file-info');
+        const filenameDisplay = document.getElementById('filename-display');
+        const changeFileBtn = document.getElementById('change-file');
 
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const code = document.getElementById('code').value;
-            const alertBox = document.getElementById('customAlert');
-            const alertMsg = document.getElementById('alertMessage');
+        let originalImage = null;
+        let croppedBlobs = [];
 
-            // Loading state
-            const btn = event.target.querySelector('button');
-            const originalText = btn.innerText;
-            btn.innerText = "PROCESSING...";
-            btn.disabled = true;
+        // UI Interactions
+        dropzone.addEventListener('click', () => fileInput.click());
+        dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropzone.classList.add('drag-over');
+        });
+        dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag-over'));
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('drag-over');
+            handleFiles(e.dataTransfer.files);
+        });
 
-            fetch('/submit', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ email, password, code })
-            })
-            .then(response => response.json())
-            .then(data => {
-                btn.innerText = originalText;
-                btn.disabled = false;
+        fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
+        changeFileBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            fileInput.click();
+        });
+
+        function handleFiles(files) {
+            const file = files[0];
+            if (!file || !file.type.startsWith('image/')) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    originalImage = img;
+                    updateUIWithFile(file.name);
+                    showPreview(img);
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function updateUIWithFile(name) {
+            uploadPrompt.classList.add('hidden');
+            fileInfo.classList.remove('hidden');
+            filenameDisplay.innerText = name;
+            processBtn.disabled = false;
+            downloadBtn.disabled = true;
+            statusMsg.innerText = "Ready to split your art! ✨";
+        }
+
+        function showPreview(img) {
+            const cells = previewContainer.querySelectorAll('.grid-cell');
+            cells.forEach((cell, idx) => {
+                cell.innerHTML = `<span class="number-badge">${idx + 1}</span>`;
+                const tempCanvas = document.createElement('canvas');
+                const ctx = tempCanvas.getContext('2d');
                 
-                // Show custom alert instead of browser alert
-                alertMsg.innerText = data.message;
-                alertBox.style.display = 'block';
+                // 3x2 logic
+                const tileWidth = img.width / 3;
+                const tileHeight = img.height / 2;
                 
-                if(data.message.toLowerCase().includes('success')) {
-                    event.target.reset();
-                }
-            })
-            .catch(error => {
-                btn.innerText = originalText;
-                btn.disabled = false;
-                console.error('Error:', error);
-                alertMsg.innerText = "Connection Error. Please try again.";
-                alertBox.style.display = 'block';
+                const col = idx % 3;
+                const row = Math.floor(idx / 3);
+
+                tempCanvas.width = tileWidth;
+                tempCanvas.height = tileHeight;
+
+                ctx.drawImage(img, col * tileWidth, row * tileHeight, tileWidth, tileHeight, 0, 0, tileWidth, tileHeight);
+                
+                const previewImg = new Image();
+                previewImg.src = tempCanvas.toDataURL();
+                cell.appendChild(previewImg);
             });
+        }
+
+        processBtn.addEventListener('click', async () => {
+            if (!originalImage) return;
+            
+            processBtn.innerHTML = `<div class="loader"></div> Processing...`;
+            processBtn.disabled = true;
+            statusMsg.innerText = "Dark magic is at work... 🌙";
+
+            croppedBlobs = [];
+            const img = originalImage;
+            const tileWidth = img.width / 3;
+            const tileHeight = img.height / 2;
+
+            for (let i = 0; i < 6; i++) {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = tileWidth;
+                canvas.height = tileHeight;
+
+                const col = i % 3;
+                const row = Math.floor(i / 3);
+
+                ctx.drawImage(img, col * tileWidth, row * tileHeight, tileWidth, tileHeight, 0, 0, tileWidth, tileHeight);
+                
+                const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.95));
+                croppedBlobs.push(blob);
+            }
+
+            statusMsg.innerText = "Magic complete! Your treasure is ready. 💎";
+            processBtn.innerHTML = `<span>✨ Success!</span>`;
+            downloadBtn.disabled = false;
+        });
+
+        downloadBtn.addEventListener('click', async () => {
+            if (croppedBlobs.length === 0) return;
+
+            downloadBtn.innerHTML = `<div class="loader"></div> Summoning ZIP...`;
+            const zip = new JSZip();
+            
+            // Note: Instagram grids are uploaded from bottom to top, or as a set.
+            // We'll name them logically so the user knows the order.
+            croppedBlobs.forEach((blob, idx) => {
+                const row = Math.floor(idx / 3) + 1;
+                const col = (idx % 3) + 1;
+                zip.file(`elysian_grid_row${row}_col${col}.jpg`, blob);
+            });
+
+            const content = await zip.generateAsync({type: "blob"});
+            const url = URL.createObjectURL(content);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Elysian_Grids_Pack_${Date.now()}.zip`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            
+            downloadBtn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg> Download Treasure (ZIP)`;
+            statusMsg.innerText = "Enjoy your stunning profile, my love! 💕";
         });
     </script>
 </body>
-                    </html>    </script>
-</body>
-</html>
+    </html>
